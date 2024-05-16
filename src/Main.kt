@@ -3,9 +3,11 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.*
 
-object contactConstants {
+object ContactConstants {
     const val CONTACTS_FILE = "kcontacts.txt"
 }
+
+// main entry for the project
 fun main() {
     var choice = showMenu()
 
@@ -51,12 +53,10 @@ fun handleMenuChoice(choice: Int): Boolean {
 }
 
 // Show all the contacts
-fun showContacts() {
-    print("Current dir is: ")
-    println(System.getProperty("user.dir"))
+fun showContacts(): Int {
     val contactList = mutableListOf<String>()
     try {
-        val inputStream: InputStream = File(contactConstants.CONTACTS_FILE).inputStream()
+        val inputStream: InputStream = File(ContactConstants.CONTACTS_FILE).inputStream()
         inputStream.bufferedReader().forEachLine {
             contactList.add(it)
         }
@@ -77,6 +77,7 @@ fun showContacts() {
         println("No contacts")
     }
 
+    return contactList.count()
 }
 
 // add a new contact
@@ -89,7 +90,7 @@ fun addContact() {
     println("Add $fullName (y/n)?")
     val addOrNot = readln().toString()
     if (addOrNot.uppercase(Locale.getDefault()).first() == 'Y') {
-        val contactFile = File(contactConstants.CONTACTS_FILE)
+        val contactFile = File(ContactConstants.CONTACTS_FILE)
         val writer = FileOutputStream(contactFile, true).bufferedWriter()
         if (contactFile.length() > 0) {
             writer.newLine()
@@ -102,10 +103,78 @@ fun addContact() {
 
 // edit a contact
 fun editContact() {
+    // show the list of contacts first
+    println("Current Contacts:")
+    if (showContacts() > 0) {
+        println("Which contact do you want to edit?")
+        val contactNum = readln().toInt()
+
+        // get all contacts into a list
+        val contactList = mutableListOf<String>()
+        val inputStream: InputStream = File(ContactConstants.CONTACTS_FILE).inputStream()
+        inputStream.bufferedReader().forEachLine {
+            contactList.add(it)
+        }
+
+        println("New First Name:")
+        val fName = readln().toString()
+        println("New Last Name:")
+        val lName = readln().toString()
+        val fullName = "$fName $lName"
+        val curName = contactList[contactNum - 1]
+        println("Change '$curName' to '$fullName'? (y/n)")
+        val changeOrNot = readln().toString()
+        if (changeOrNot.uppercase(Locale.getDefault()).first() == 'Y') {
+            contactList[contactNum - 1] = fullName
+        }
+
+        //rewrite the file
+        val contactFile = File(ContactConstants.CONTACTS_FILE)
+        val writer = FileOutputStream(contactFile, false).bufferedWriter()
+
+        for (name in contactList) {
+            writer.write(name)
+            writer.newLine()
+        }
+        writer.flush()
+        writer.close()
+    }
 
 }
 
 // delete a contact
 fun deleteContact() {
+    // show the list of contacts first
+    println("Current Contacts:")
+    if (showContacts() > 0) {
+        println("Which contact do you want to delete?")
+        val contactNum = readln().toInt()
+
+        // get all contacts into a list
+        val contactList = mutableListOf<String>()
+        val inputStream: InputStream = File(ContactConstants.CONTACTS_FILE).inputStream()
+        inputStream.bufferedReader().forEachLine {
+            contactList.add(it)
+        }
+
+        val curName = contactList[contactNum - 1]
+        println("Delete '$curName'? (y/n)")
+        val delOrNot = readln().toString()
+        if (delOrNot.uppercase(Locale.getDefault()).first() == 'Y') {
+            contactList.removeAt(contactNum - 1)
+        }
+
+        //rewrite the file
+        val contactFile = File(ContactConstants.CONTACTS_FILE)
+        val writer = FileOutputStream(contactFile, false).bufferedWriter()
+
+        for (name in contactList) {
+            writer.write(name)
+            writer.newLine()
+        }
+        writer.flush()
+        writer.close()
+    }
+
 
 }
