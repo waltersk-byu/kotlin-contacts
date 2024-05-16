@@ -3,8 +3,18 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.*
 
+// Constants
 object ContactConstants {
     const val CONTACTS_FILE = "kcontacts.txt"
+}
+
+// Contact class
+class Contact {
+    var FirstName = ""
+    var LastName = ""
+    fun fullName (): String {
+        return "$FirstName $LastName"
+    }
 }
 
 // main entry for the project
@@ -82,20 +92,19 @@ fun showContacts(): Int {
 
 // add a new contact
 fun addContact() {
+    val contact = Contact()
     println("First Name:")
-    val fName = readln().toString()
+    contact.FirstName = readln().toString()
     println("Last Name:")
-    val lName = readln().toString()
-    val fullName = "$fName $lName"
+    contact.LastName = readln().toString()
+    val fullName = contact.fullName()
     println("Add $fullName (y/n)?")
     val addOrNot = readln().toString()
     if (addOrNot.uppercase(Locale.getDefault()).first() == 'Y') {
         val contactFile = File(ContactConstants.CONTACTS_FILE)
         val writer = FileOutputStream(contactFile, true).bufferedWriter()
-        if (contactFile.length() > 0) {
-            writer.newLine()
-        }
         writer.write(fullName)
+        writer.newLine()
         writer.flush()
         writer.close()
     }
